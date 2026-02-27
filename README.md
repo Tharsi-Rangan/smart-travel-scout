@@ -1,5 +1,8 @@
 # Smart Travel Scout
 
+## 🌍 Live Demo
+https://smart-travel-scout-xi.vercel.app/
+
 Smart Travel Scout is a grounded AI-powered travel recommendation application built with Next.js and the Gemini API.
 
 Users describe their ideal travel experience in natural language, and the system returns matching travel packages strictly from a predefined inventory.
