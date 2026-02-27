@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { INVENTORY } from "@/data/inventory";
 import { callGemini } from "@/lib/gemini";
 import { ScoutResponseSchema } from "@/lib/schema";
+import { extractBudget } from "@/lib/query";
 
 /**
  * Builds the strict system prompt.
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
     if (!query || typeof query !== "string") {
       return NextResponse.json(
         { error: "Please provide a valid travel request." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -71,27 +72,27 @@ export async function POST(req: Request) {
 
     // Zod validation boundary
     const validated = ScoutResponseSchema.parse(parsedJson);
+    const budget = extractBudget(query.trim());
 
     // Grounding safeguard (remove invalid IDs)
-    const inventoryMap = new Map(
-      INVENTORY.map((item) => [item.id, item])
-    );
+    const inventoryMap = new Map(INVENTORY.map((item) => [item.id, item]));
 
     const groundedResults = validated.matches
       .filter((m) => inventoryMap.has(m.id))
       .map((m) => ({
         item: inventoryMap.get(m.id)!,
         reason: m.reason,
-      }));
-
+      }))
+      .filter(({ item }) => (budget ? item.price <= budget : true));
     return NextResponse.json({
       query,
+      budget,
       results: groundedResults,
       grounded: true,
     });
+    
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unexpected error";
+    const message = error instanceof Error ? error.message : "Unexpected error";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
