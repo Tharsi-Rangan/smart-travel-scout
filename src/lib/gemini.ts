@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+
 /**
  * Ensures required environment variables exist.
  * Fail fast if GEMINI_API_KEY is missing.
@@ -20,7 +21,7 @@ const genAI = new GoogleGenerativeAI(requireEnv("GEMINI_API_KEY"));
  */
 export async function callGemini(prompt: string): Promise<string> {
   const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
+    model:  "gemini-2.5-flash",
     generationConfig: {
       temperature: 0,
     },
